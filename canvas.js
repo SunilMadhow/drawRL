@@ -1,15 +1,26 @@
+// import * from "utils.js"
+
+var tilings = []; //contains the coloured version of each canvas-drawn tiling's pixel data
+
 var canvas, ctx, flag = false,
         prevX = 0,
         currX = 0,
         prevY = 0,
         currY = 0,
         dot_flag = false;
+        
+var curColor = {
+    r:219,
+    g: 219,
+    b:219
 
+}
+var colorLayerData;
 
 var x = "red",
     y = 5;
 
-function init() {
+function initLineMode() {
     canvas = document.getElementById('can');
     canvas.height = window.innerHeight 
     canvas.width = canvas.height
@@ -17,20 +28,41 @@ function init() {
     w = canvas.width;
     h = canvas.height;
     ctx.font = "20px Arial";
-    drawGrid(ctx, canvas.width, canvas.height, canvas.width/8)
+    drawGrid(ctx, canvas.width, canvas.height, canvas.width/8);
 
-    canvas.addEventListener("mousemove", function (e) {
-        findxy('move', e)
-    }, false);
-    canvas.addEventListener("mousedown", function (e) {
-        findxy('down', e)
-    }, false);
-    canvas.addEventListener("mouseup", function (e) {
-        findxy('up', e)
-    }, false);
-    canvas.addEventListener("mouseout", function (e) {
-        findxy('out', e)
-    }, false);
+    canvas.addEventListener("mousemove", mv, false);
+    canvas.addEventListener("mousedown", dwn, false);
+    canvas.addEventListener("mouseup", up, false);
+    canvas.addEventListener("mouseout", out, false);
+}
+
+function mv(e) {
+    findxy('move', e);
+}
+function dwn(e) {
+    findxy('down', e);
+}
+function up(e) {
+    findxy('up', e);
+}
+function out(e) {
+    findxy('out', e);
+}
+
+function initPaintMode() {
+    canvas.removeEventListener("mousemove", mv, false);
+    canvas.removeEventListener("mousedown", dwn, false);
+    canvas.removeEventListener("mouseup", up, false);
+    canvas.removeEventListener("mouseout", out, false);
+
+    canvas.addEventListener("mousedown", pnt, false);
+}
+
+function pnt(e) {
+    var mouseX = e.pageX - canvas.offsetLeft,
+        mouseY = e.pageY - canvas.offsetTop;
+
+    paintAt(mouseX, mouseY)
 }
 
 function draw() {
@@ -86,25 +118,122 @@ function plotPoint(x, y) {
     ctx.fillStyle = "gray"
     ctx.fillRect(x, y, 20, 20)
 }
+function storeTiling() {
+    fillColorR = 219;
+    fillColorB = 219;
+    fillColorG = 219
+}
 
-function floodFill(a, b) {
-    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    startPixel = ctx.getImageData(0, 0, a, b).data;
-    var startColor = [startPixel[0], startPixel[1], startPixel[2]]
-    var pixelStack = [[a, b]];
+function updateColor() { //every time a call to floodfill is made, we should update the fill color
+    curColor.b -= 30;
+    curColor.g -= 30;
+}
+
+function floodfill(startX, startY, startR, startG, startB) {
+    var newPos,
+        x,
+        y,
+        pixelPos,
+        reachLeft,
+        reachRight,
+        drawingBoundLeft = 0,
+        drawingBoundTop = 0,
+        drawingBoundRight = 0 + canvas.width,
+        drawingBoundBottom = 0 + canvas.height,
+        pixelStack = [[startX, startY]];
     
-    while(pixelStack.length) {
-        var x, y, newPos, reachLeft, reachRight;
+
+    while (pixelStack.length) {    
+
         newPos = pixelStack.pop();
         x = newPos[0];
         y = newPos[1];
-        pixelPos = (y*canvas.width+x)*4;
 
-        while(y -- >= drawingBoundTop && matchColor(startColor, pixelPos)) {
-            colorPixel(pixelPos);
+        // Get current pixel position
+        pixelPos = (y * canvas.width + x) * 4;
+
+        // Go up as long as the color matches and are inside the canvas
+        while (y >= drawingBoundTop && matchStartColor(pixelPos, startR, startG, startB)) {
+            y -= 1;
+            pixelPos -= canvas.width * 4;
+        }
+
+        pixelPos += canvas.width * 4;
+        y += 1;
+        reachLeft = false;
+        reachRight = false;
+
+        // Go down as long as the color matches and in inside the canvas
+        while (y <= drawingBoundBottom && matchStartColor(pixelPos, startR, startG, startB)) {
+            y += 1;
+
+            colorPixel(pixelPos, curColor.r, curColor.g, curColor.b);
+
+            if (x > drawingBoundLeft) {
+                if (matchStartColor(pixelPos - 4, startR, startG, startB)) {
+                    if (!reachLeft) {
+                        // Add pixel to stack
+                        pixelStack.push([x - 1, y]);
+                        reachLeft = true;
+                    }
+                } else if (reachLeft) {
+                    reachLeft = false;
+                }
+            }
+
+            if (x < drawingBoundRight) {
+                if (matchStartColor(pixelPos + 4, startR, startG, startB)) {
+                    if (!reachRight) {
+                        // Add pixel to stack
+                        pixelStack.push([x + 1, y]);
+                        reachRight = true;
+                    }
+                } else if (reachRight) {
+                    reachRight = false;
+                }
+            }
+
+            pixelPos += canvas.width * 4;
         }
     }
+    ctx.putImageData(colorLayerData, 0, 0);
 
+}
+
+function paintAt (startX, startY) {
+    updateColor();
+    colorLayerData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    var pixelPos = (startY * canvas.width + startX) * 4,
+        r = colorLayerData.data[pixelPos],
+        g = colorLayerData.data[pixelPos + 1],
+        b = colorLayerData.data[pixelPos + 2],
+        a = colorLayerData.data[pixelPos + 3];
+
+
+    floodfill(startX, startY, r, g, b);
+
+}
+
+function withinInterval(val, center,  margin) {
+    return (val > center - margin && val < center + margin);
+
+}
+function matchStartColor(pixelPos, startR, startG, startB)
+{
+  var r = colorLayerData.data[pixelPos];    
+  var g = colorLayerData.data[pixelPos+1];  
+  var b = colorLayerData.data[pixelPos+2];
+
+  return (r == startR && g == startG && b == startB) || (withinInterval(r, 204, 5) && withinInterval(b, 204, 5) && withinInterval(g, 204, 5)) || (r == 0 && b == 0 && g == 0);
+}
+
+
+function colorPixel(pixelPos)
+{
+  colorLayerData.data[pixelPos] = curColor.r;
+  colorLayerData.data[pixelPos+1] = curColor.g;
+  colorLayerData.data[pixelPos+2] = curColor.b;
+  colorLayerData.data[pixelPos+3] = 255;
 }
 
 
@@ -132,27 +261,27 @@ function drawGrid(ctx, w, h, step) {
                 ctx.fillText((1 - 2*y/h).toString(), w/2, y);
             }
     }
-    ctx.fillText("1", w/2, 15)
+    ctx.fillText("1", w/2, 15);
     ctx.strokeStyle = 'rgb(204,204,204)';
     ctx.lineWidth = 1;
     ctx.stroke(); 
 
-    ctx.beginPath()
-    ctx.moveTo(w/2, 0)
-    ctx.lineTo(w/2, h)
-    ctx.lineWidth = 5
-    ctx.strokeStyle = "black"
-    ctx.stroke()
-    ctx.beginPath()
-    ctx.moveTo(0, h/2)
-    ctx.lineTo(w, h/2)
-    ctx.lineWidth = 5
-    ctx.strokeStyle = "black"
-    ctx.stroke()
+    ctx.beginPath();
+    ctx.moveTo(w/2, 0);
+    ctx.lineTo(w/2, h);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, h/2);
+    ctx.lineTo(w, h/2);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "black";
+    ctx.stroke();
 };
 
 
 
-init()
-plotPoint(10, 10)
-console.log(canvas.height)
+initLineMode();
+// plotPoint(10, 10)
+console.log(canvas.height);

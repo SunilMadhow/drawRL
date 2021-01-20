@@ -3,13 +3,26 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
+        <div style="width: 600px; float: left;">
+            <canvas id = "can"></canvas>
+        </div>  
+        <div style="margin-left: 50%; height:100%">  
+            <label for="tilecount">Number of tilings</label>
 
-        <canvas id = "can"></canvas>
-
-        <div>
-            <button>Confirm tiling</button>
+            <select name="tilecount" id="tilecount">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+            <button id = "save" onclick="storeTiling()">New tiling</button>
+            <button id = "color" onclick="initPaintMode()">Confirm tiling</button>
+            <script src = "canvas.js"></script>
         </div>
-        <script src = "canvas.js"></script>
     </body>
 
 </html>
