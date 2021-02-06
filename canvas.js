@@ -2,8 +2,8 @@
 
 var tilings = []; //contains the coloured version of each canvas-drawn tiling's pixel data
 var numTiles = [] //ith entry is the number of tiles in tiling[i]
-var tile_counter = 0;
-
+var numTilesCurrent = 0;
+var current_tile = 0;
 var canvas, ctx, flag = false,
         prevX = 0,
         currX = 0,
@@ -67,7 +67,7 @@ function exitPaintMode() {
 function pnt(e) {
     var mouseX = e.pageX - canvas.offsetLeft,
         mouseY = e.pageY - canvas.offsetTop;
-
+    numTilesCurrent ++;
     paintAt(mouseX, mouseY);
 }
 
@@ -127,8 +127,8 @@ function plotPoint(x, y) {
 
 
 function updateColor() { //every time a call to floodfill is made, we should update the fill color
-    curColor.b -= 30;
-    curColor.g -= 30;
+    curColor.b -= 15;
+    curColor.g -= 15;
 }
 
 function floodfill(startX, startY, startR, startG, startB) {
@@ -284,10 +284,13 @@ function drawGrid(ctx, w, h, step) {
 
 function storeTiling() {
     tilings.push(colorLayerData);
+    numTiles.push(numTilesCurrent);
+    numTilesCurrent = 0;
     exitPaintMode();
     curColor.r = 219;
     curColor.g = 219;
     curColor.b = 219;
+    current_tile ++;
     document.getElementById("numtiles").textContent="number of tilings: " + tilings.length;
     initLineMode();
 }
@@ -299,20 +302,25 @@ function coordSwitch(x, y) { //pos, vel
     return [plotx, ploty];
 }
 
-function queryPoint(pos, vel) {
-    b == coordSwitch(pos, vel);
-    x = b[0];
-    y = b[1];
+function queryPoint(pos, vel, action) { //returns the one-hot vector corrosponding to the (x,y) datum in the user tiling
+    b = coordSwitch(pos, vel);
+    xcor = b[0];
+    ycor = b[1];
+    // console.log(x, y);
+    
+    var n = 0;
+    for (let i = 0; i < tilings.length; ++i) {
+        n += numTiles[i];
+    }
+    console.log(n);
+    one_hot = [];
+    for (let i=0; i<tilings.length*(num_actions)*n; ++i) onehot[i] = 0;
     for (i = 0; i < tilings.length; i ++) {
-        
+        pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
+        num_tile = (219 - pix)/15;
+        one_
     }
 }
 
 
 initLineMode();
-b = coordSwitch(1, -.3);
-s = b[0];
-p = b[1];
-console.log(s);
-plotPoint(s, p);
-console.log(canvas.height);
