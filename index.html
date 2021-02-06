@@ -6,21 +6,14 @@
         <div style="width: 600px; float: left;">
             <canvas id = "can"></canvas>
         </div>  
-        <div style="margin-left: 50%; height:100%">  
-            <label for="tilecount">Number of tilings</label>
-
-            <select name="tilecount" id="tilecount">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
+        <div style="margin-left: 50%; height:100% float:right">  
             <button id = "save" onclick="storeTiling()">New tiling</button>
             <button id = "color" onclick="initPaintMode()">Confirm tiling</button>
+            <button id = "start" onclick = "learn()">Begin Learning!</button>
+            <span id = 'numtiles'>number of tilings: 0</span>
+            <div id = "candiv">
+              <canvas id = "env"></canvas>
+            </div>
             <script src = "canvas.js"></script>
         </div>
     </body>

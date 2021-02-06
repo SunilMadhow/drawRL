@@ -1,6 +1,8 @@
 // import * from "utils.js"
 
 var tilings = []; //contains the coloured version of each canvas-drawn tiling's pixel data
+var numTiles = [] //ith entry is the number of tiles in tiling[i]
+var tile_counter = 0;
 
 var canvas, ctx, flag = false,
         prevX = 0,
@@ -25,6 +27,7 @@ function initLineMode() {
     canvas.height = window.innerHeight 
     canvas.width = canvas.height
     ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     w = canvas.width;
     h = canvas.height;
     ctx.font = "20px Arial";
@@ -54,15 +57,18 @@ function initPaintMode() {
     canvas.removeEventListener("mousedown", dwn, false);
     canvas.removeEventListener("mouseup", up, false);
     canvas.removeEventListener("mouseout", out, false);
-
     canvas.addEventListener("mousedown", pnt, false);
+}
+
+function exitPaintMode() {
+    canvas.removeEventListener("mousedown", pnt, false);
 }
 
 function pnt(e) {
     var mouseX = e.pageX - canvas.offsetLeft,
         mouseY = e.pageY - canvas.offsetTop;
 
-    paintAt(mouseX, mouseY)
+    paintAt(mouseX, mouseY);
 }
 
 function draw() {
@@ -116,13 +122,9 @@ function findxy(res, e) {
 
 function plotPoint(x, y) {
     ctx.fillStyle = "gray"
-    ctx.fillRect(x, y, 20, 20)
+    ctx.fillRect(x-10, y-10, 20, 20)
 }
-function storeTiling() {
-    fillColorR = 219;
-    fillColorB = 219;
-    fillColorG = 219
-}
+
 
 function updateColor() { //every time a call to floodfill is made, we should update the fill color
     curColor.b -= 30;
@@ -280,8 +282,37 @@ function drawGrid(ctx, w, h, step) {
     ctx.stroke();
 };
 
+function storeTiling() {
+    tilings.push(colorLayerData);
+    exitPaintMode();
+    curColor.r = 219;
+    curColor.g = 219;
+    curColor.b = 219;
+    document.getElementById("numtiles").textContent="number of tilings: " + tilings.length;
+    initLineMode();
+}
+
+function coordSwitch(x, y) { //pos, vel
+    plotx = (1 +x ) * 378;
+    ploty = (1 - y) * 378;
+    // ploty = 100;
+    return [plotx, ploty];
+}
+
+function queryPoint(pos, vel) {
+    b == coordSwitch(pos, vel);
+    x = b[0];
+    y = b[1];
+    for (i = 0; i < tilings.length; i ++) {
+        
+    }
+}
 
 
 initLineMode();
-// plotPoint(10, 10)
+b = coordSwitch(1, -.3);
+s = b[0];
+p = b[1];
+console.log(s);
+plotPoint(s, p);
 console.log(canvas.height);
