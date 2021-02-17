@@ -312,14 +312,18 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     for (let i = 0; i < tilings.length; ++i) {
         n += numTiles[i];
     }
-    console.log(n);
     one_hot = [];
-    for (let i=0; i<tilings.length*(num_actions)*n; ++i) onehot[i] = 0;
+    for (let i=0; i<tilings.length*(num_actions)*n; ++i) one_hot[i] = 0;
     for (i = 0; i < tilings.length; i ++) {
         pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
         num_tile = (219 - pix)/15;
-        one_
+        let partial_sum = 0;
+        for (let j = 0; j < i; j ++) {
+            partial_sum += numTiles[j];
+        }
+        one_hot[n*(action - 1)*i+partial_sum+num_tile] = 1;
     }
+    console.log(one_hot);
 }
 
 
