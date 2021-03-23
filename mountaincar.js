@@ -11,7 +11,6 @@ function reset() {
 }
 
 function observe() {
-	console.log([position, velocity]);
 	return [position, velocity];
 }
 

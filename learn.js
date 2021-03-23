@@ -45,6 +45,7 @@ function learn() {
 		G += reward;
 		if (reward == 0) {
 			episodes ++;
+			console.log(episodes);
 			console.log(G);
 			G = 0;
 			reset();
@@ -54,8 +55,6 @@ function learn() {
 			G += reward;
 		}
 		observation = observe();
-		console.log("observed");
-		console.log(observation);
 
 		normed = normalize(observation);
 		if(Math.random() > epsilon) {
@@ -70,7 +69,7 @@ function learn() {
 		x_s = queryPoint(observation, action);
 		w = vectorSum(w, scalarMult(alpha, scalarMult(delta, x_s)));
 		prediction = prime;
-	 }, 100);
+	 }, 5);
 
 }
 
