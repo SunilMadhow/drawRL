@@ -15,12 +15,15 @@ var curColor = {
     r:219,
     g: 219,
     b:219
-
 }
+
 var colorLayerData;
 
 var x = "red",
     y = 5;
+
+var w, h;
+
 
 function initLineMode() {
     canvas = document.getElementById('can');
@@ -127,8 +130,8 @@ function plotPoint(x, y) {
 
 
 function updateColor() { //every time a call to floodfill is made, we should update the fill color
-    curColor.b -= 15;
-    curColor.g -= 15;
+    curColor.b -= 10;
+    curColor.g -= 10;
 }
 
 function floodfill(startX, startY, startR, startG, startB) {
@@ -306,7 +309,6 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     b = coordSwitch(pos, vel);
     xcor = b[0];
     ycor = b[1];
-    // console.log(x, y);
     
     var n = 0;
     for (let i = 0; i < tilings.length; ++i) {
@@ -316,14 +318,45 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     for (let i=0; i<tilings.length*(num_actions)*n; ++i) one_hot[i] = 0;
     for (i = 0; i < tilings.length; i ++) {
         pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
-        num_tile = (219 - pix)/15;
+        num_tile = (219 - pix)/10;
         let partial_sum = 0;
         for (let j = 0; j < i; j ++) {
             partial_sum += numTiles[j];
         }
         one_hot[n*(action - 1)*i+partial_sum+num_tile] = 1;
     }
-    console.log(one_hot);
+    return one_hot;
+}
+
+var num_generated = 0;
+function stock_tiling(x, y) {
+
+    var step_x = w / x;
+    var step_y = h / y;
+
+    var offset_x = num_generated * step_x / x / 2;
+    var offset_y = num_generated * step_y*  1.03 / y /5;
+
+    ctx.beginPath(); 
+    for (var x=step_x;x<=w - 10;x+=step_x) {
+            ctx.moveTo(x +offset_x, 0);
+            ctx.lineTo(x + offset_x, h);
+    }
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 5;
+    ctx.stroke(); 
+    ctx.beginPath(); 
+    for (var y=step_y;y<=h - 10;y+=step_y) {
+            ctx.moveTo(0 , y+ offset_y);
+            ctx.lineTo(w , y+ offset_y);
+    }
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 5;
+    ctx.stroke();  
+
+    num_generated ++;
+
 }
 
 
