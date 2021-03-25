@@ -206,7 +206,6 @@ function floodfill(startX, startY, startR, startG, startB) {
 }
 
 function paintAt (startX, startY) {
-    updateColor();
     colorLayerData = ctx.getImageData(0, 0, canvas.width, canvas.height)
     var pixelPos = (startY * canvas.width + startX) * 4,
         r = colorLayerData.data[pixelPos],
@@ -214,8 +213,9 @@ function paintAt (startX, startY) {
         b = colorLayerData.data[pixelPos + 2],
         a = colorLayerData.data[pixelPos + 3];
 
-
     floodfill(startX, startY, r, g, b);
+    updateColor();
+
 
 }
 
@@ -299,9 +299,8 @@ function storeTiling() {
 }
 
 function coordSwitch(x, y) { //pos, vel
-    plotx = (1 +x ) * 378;
-    ploty = (1 - y) * 378;
-    // ploty = 100;
+    plotx = Math.round((1 +x ) * 378);
+    ploty = Math.round((1 - y) * 378);
     return [plotx, ploty];
 }
 
@@ -309,7 +308,7 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     b = coordSwitch(pos, vel);
     xcor = b[0];
     ycor = b[1];
-    
+   
     var n = 0;
     for (let i = 0; i < tilings.length; ++i) {
         n += numTiles[i];
@@ -318,6 +317,7 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     for (let i=0; i<tilings.length*(num_actions)*n; ++i) one_hot[i] = 0;
     for (i = 0; i < tilings.length; i ++) {
         pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
+        console.log(pix);
         num_tile = (219 - pix)/10;
         let partial_sum = 0;
         for (let j = 0; j < i; j ++) {
@@ -334,21 +334,21 @@ function stock_tiling(x, y) {
     var step_x = w / x;
     var step_y = h / y;
 
-    var offset_x = num_generated * step_x / x / 2;
-    var offset_y = num_generated * step_y*  1.03 / y /5;
+    var offset_x = num_generated * step_x / x;
+    var offset_y = num_generated * step_y*  1.03 / y;
 
     ctx.beginPath(); 
-    for (var x=step_x;x<=w - 10;x+=step_x) {
-            ctx.moveTo(x +offset_x, 0);
-            ctx.lineTo(x + offset_x, h);
+    for (var x=offset_x % step_x;x<=w - 10;x+=step_x) {
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
     }
     ctx.strokeStyle = "red";
     ctx.lineWidth = 5;
     ctx.stroke(); 
     ctx.beginPath(); 
-    for (var y=step_y;y<=h - 10;y+=step_y) {
-            ctx.moveTo(0 , y+ offset_y);
-            ctx.lineTo(w , y+ offset_y);
+    for (var y= offset_y % step_y;y<=h - 10;y+=step_y) {
+            ctx.moveTo(0 , y);
+            ctx.lineTo(w , y);
     }
 
     ctx.strokeStyle = "red";
