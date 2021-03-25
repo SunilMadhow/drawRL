@@ -299,8 +299,8 @@ function storeTiling() {
 }
 
 function coordSwitch(x, y) { //pos, vel
-    plotx = Math.round((1 +x ) * 378);
-    ploty = Math.round((1 - y) * 378);
+    let plotx = Math.round((1 +x ) * 378);
+    let ploty = Math.round((1 - y) * 378);
     return [plotx, ploty];
 }
 
@@ -316,7 +316,11 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     one_hot = [];
     for (let i=0; i<tilings.length*(num_actions)*n; ++i) one_hot[i] = 0;
     for (i = 0; i < tilings.length; i ++) {
-        pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
+        let pix = tilings[i].data[(canvas.width * ycor + xcor)*4 + 1]; //green value for pixel at x, y
+        if (pix == 0) {
+            let coin = [1,-1];
+            pix = tilings[i].data[(canvas.width * (ycor+10*coin[Math.floor(Math.random() * coin.length)]) + xcor + 10*coin[Math.floor(Math.random() * coin.length)])*4 + 1]; //if we query a point, just jump somewhere
+        }
         console.log(pix);
         num_tile = (219 - pix)/10;
         let partial_sum = 0;
