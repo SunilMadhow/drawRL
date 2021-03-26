@@ -13,8 +13,8 @@ var canvas, ctx, flag = false,
         
 var curColor = {
     r:219,
-    g: 219,
-    b:219
+    g: 255,
+    b:255
 }
 
 var colorLayerData;
@@ -123,14 +123,13 @@ function findxy(res, e) {
     }
 }
 
-function plotPoint(x, y) {
+function plot_point(x, y) {
     ctx.fillStyle = "gray"
     ctx.fillRect(x-10, y-10, 20, 20)
 }
 
 
 function updateColor() { //every time a call to floodfill is made, we should update the fill color
-    curColor.b -= 10;
     curColor.g -= 10;
 }
 
@@ -291,8 +290,8 @@ function storeTiling() {
     numTilesCurrent = 0;
     exitPaintMode();
     curColor.r = 219;
-    curColor.g = 219;
-    curColor.b = 219;
+    curColor.g = 255;
+    curColor.b = 255;
     current_tile ++;
     document.getElementById("numtiles").textContent="number of tilings: " + tilings.length;
     initLineMode();
@@ -321,8 +320,7 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
             let coin = [1,-1];
             pix = tilings[i].data[(canvas.width * (ycor+10*coin[Math.floor(Math.random() * coin.length)]) + xcor + 10*coin[Math.floor(Math.random() * coin.length)])*4 + 1]; //if we query a point, just jump somewhere
         }
-        console.log(pix);
-        num_tile = (219 - pix)/10;
+        num_tile = (255 - pix)/10;
         let partial_sum = 0;
         for (let j = 0; j < i; j ++) {
             partial_sum += numTiles[j];
@@ -331,6 +329,7 @@ function queryPoint(pos, vel, action) { //returns the one-hot vector corrospondi
     }
     return one_hot;
 }
+
 
 var num_generated = 0;
 function stock_tiling(x, y) {

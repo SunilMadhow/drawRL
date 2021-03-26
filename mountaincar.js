@@ -23,8 +23,27 @@ function update(action) { //action \in [-1, 0, 1] accelerate left, idle, acceler
 	else { return -1; }
 }
 
+function remap_action(action) { //map a from [-1, 0, 1] to [1, 2, 3]
+	return action + 2;
+}
+
 function clip(val, min, max) {
 	if (val < min) return min;
 	if (val > max) return max;
 	return val;
+}
+
+//rendering
+function init_show() {
+	canvas = document.getElementById('can');
+    canvas.height = 300;
+    canvas.width = 300;
+    ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    w = canvas.width;
+    h = canvas.height;
+}
+
+function show() {
+
 }

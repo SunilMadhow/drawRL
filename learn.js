@@ -30,13 +30,14 @@ function Q(observation) {
 
 function learn() {
 	var reward = 0;
+	var fifty_ep_sum = 0;
 	var discount = 1;
 	var observation = observe();
-	console.log(observation);
 	var G = 0;
 	var prediction = Math.max(Q(observation));
 	var action = 0;
 	var prime = 0;
+	var steps = 0;
 	w = initParameter();
 
 	var episodes = 0;
@@ -45,8 +46,12 @@ function learn() {
 		G += reward;
 		if (reward == 0) {
 			episodes ++;
-			console.log(episodes);
-			console.log(G);
+			fifty_ep_sum += G;
+			if (episodes % 50 == 0) {
+
+				fifty_ep_sum = 0;
+				console.log("Average score over episodes " + episodes - 50 + " to " + episodes  +" = " + fifty_ep_sum/50);
+			}
 			G = 0;
 			reset();
 			observation = observe();
@@ -55,7 +60,10 @@ function learn() {
 			G += reward;
 		}
 		observation = observe();
-
+		let canvpoint = coordSwitch(observation[0], observation[1]);
+		// if (steps % 150 == 0) {
+		// 	plot_point(canvpoint[0], canvpoint[1]);
+		// }
 		normed = normalize(observation);
 		if(Math.random() > epsilon) {
 			q_list = Q(observation);
@@ -66,9 +74,10 @@ function learn() {
 			action = Math.floor(Math.random() * num_actions);
 		}
 		delta = reward + discount*prime - prediction;
-		x_s = queryPoint(observation, action);
+		x_s = queryPoint(observation, remap_action(action));
 		w = vectorSum(w, scalarMult(alpha, scalarMult(delta, x_s)));
 		prediction = prime;
+		steps ++;
 	 }, 5);
 
 }
