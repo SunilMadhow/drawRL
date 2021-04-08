@@ -50,7 +50,7 @@ function learn() {
 			if (episodes % 50 == 0) {
 
 				fifty_ep_sum = 0;
-				console.log("Average score over episodes " + episodes - 50 + " to " + episodes  +" = " + fifty_ep_sum/50);
+				console.log("Average score over 50 episodes at "  + episodes  +" = " + fifty_ep_sum/50.0);
 			}
 			G = 0;
 			reset();
