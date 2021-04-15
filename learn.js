@@ -68,13 +68,13 @@ function learn() {
 		if(Math.random() > epsilon) {
 			q_list = Q(observation);
 			prime = Math.max(q_list);
-			action = argmax(q_list);
+			action = remap_action(argmax(q_list));
 		}
 		else {
 			action = Math.floor(Math.random() * num_actions);
 		}
 		delta = reward + discount*prime - prediction;
-		x_s = queryPoint(normed, remap_action(action));
+		x_s = queryPoint(normed, action);
 		w = vectorSum(w, scalarMult(alpha, scalarMult(delta, x_s)));
 		prediction = prime;
 		steps ++;
