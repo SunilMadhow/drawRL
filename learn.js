@@ -30,7 +30,7 @@ function Q(observation) {
 
 function learn() {
 	var reward = 0;
-	var fifty_ep_sum = 0;
+	var fifty_ep_sum = 0 ;
 	var discount = 1;
 	var observation = observe();
 	var G = 0;
@@ -74,7 +74,7 @@ function learn() {
 			action = Math.floor(Math.random() * num_actions);
 		}
 		delta = reward + discount*prime - prediction;
-		x_s = queryPoint(observation, remap_action(action));
+		x_s = queryPoint(normed, remap_action(action));
 		w = vectorSum(w, scalarMult(alpha, scalarMult(delta, x_s)));
 		prediction = prime;
 		steps ++;
