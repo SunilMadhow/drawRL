@@ -23,7 +23,7 @@ function initParameter() {
 function Q(observation) {
 	let q_list = [0, 0, 0];
 	for (let i = 0; i < 3; i ++) {
-		q_list[i] = dot(queryPoint(observation[0], observation[1]), w);
+		q_list[i] = dot(queryPoint(observation[0], observation[1], i), w);
 	}
 	return q_list;
 }
@@ -42,15 +42,17 @@ function learn() {
 
 	var episodes = 0;
 	setInterval(function() { 
-		reward = update(action);
+		reward = update(remap_action(action));
 		G += reward;
 		if (reward == 0) {
 			episodes ++;
+			document.getElementById("numepisodes").textContent="number of episodes: " + episodes;
+
 			fifty_ep_sum += G;
 			if (episodes % 50 == 0) {
-
-				fifty_ep_sum = 0;
 				console.log("Average score over 50 episodes at "  + episodes  +" = " + fifty_ep_sum/50.0);
+				fifty_ep_sum = 0;
+
 			}
 			G = 0;
 			reset();
@@ -66,9 +68,9 @@ function learn() {
 		// }
 		normed = normalize(observation);
 		if(Math.random() > epsilon) {
-			q_list = Q(observation);
+			q_list = Q(normed);
 			prime = Math.max(q_list);
-			action = remap_action(argmax(q_list));
+			action = argmax(q_list);
 		}
 		else {
 			action = Math.floor(Math.random() * num_actions);
